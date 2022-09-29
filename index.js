@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const parkRouter = require("./routes/parkRouter");
-const userRouter = require("./routes/userRouter");
+const authRouter = require("./routes/authentication");
 const cors = require("cors");
 
 const PORT = 5001;
@@ -14,7 +14,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/parks", parkRouter);
-app.use("/users", userRouter);
+app.use("/users", authRouter);
 
 app.listen(PORT, () =>
   console.log(`I am listening on PORT: http://localhost:${PORT}`)
