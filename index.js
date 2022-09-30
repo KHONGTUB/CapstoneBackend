@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const parkRouter = require("./routes/parkRouter");
 const authRouter = require("./routes/authentication");
+const postRouter = require("./routes/postsRouter");
 const cors = require("cors");
 
 const PORT = 5001;
@@ -15,6 +16,7 @@ app.get("/", (req, res) => {
 
 app.use("/parks", parkRouter);
 app.use("/users", authRouter);
+app.use("/posts", postRouter);
 
 app.listen(PORT, () =>
   console.log(`I am listening on PORT: http://localhost:${PORT}`)

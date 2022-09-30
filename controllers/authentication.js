@@ -3,6 +3,9 @@ const jwt = require("jsonwebtoken");
 const pool = require("../sql/connection");
 const bcrypt = require("bcrypt");
 const { handleSQLError } = require("../sql/error");
+require("dotenv").config();
+
+const { SECRET } = process.env;
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -10,17 +13,15 @@ function authenticateToken(req, res, next) {
 
   if (!token) return res.sendStatus(401);
 
-  jwt.verify(token, "MekongCatfish", (err, result) => {
+  jwt.verify(token, SECRET, (err, result) => {
     if (err) return res.sendStatus(403);
-
-    req.user = user;
 
     next();
   });
 }
 
 function generateToken(user) {
-  return jwt.sign(user, "MekongCatfish");
+  return jwt.sign(user, SECRET);
 }
 
 const signup = async (req, res) => {
@@ -38,7 +39,7 @@ const signup = async (req, res) => {
           `INSERT INTO users (email, user_name, hashed) VALUES ("${email}", "${user_name}", "${hashedPassword}")`,
           (err, results) => {
             if (err) return handleSQLError(res, err);
-            return res.json({ newId: results.insertId });
+            return res.send("You have been registered!");
           }
         );
       }
@@ -57,7 +58,7 @@ const login = (req, res) => {
         const match = await bcrypt.compare(password, rows[0].hashed);
         if (match) {
           const token = generateToken({ user_name, password });
-          res.json(token);
+          res.json({ token: token, username: rows[0].user_name });
         } else {
           res.sendStatus(403);
         }
@@ -68,4 +69,4 @@ const login = (req, res) => {
   );
 };
 
-module.exports = { login, signup };
+module.exports = { login, signup, authenticateToken };
