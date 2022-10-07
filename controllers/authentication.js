@@ -32,9 +32,8 @@ const signup = async (req, res) => {
     (err, rows) => {
       if (err) return handleSQLError(res, err);
       if (rows.length > 0) {
-        return res.send("Username Already Exsist!");
+        return res.status(403).send("Username is taken");
       } else {
-        console.log("Available");
         pool.query(
           `INSERT INTO users (email, user_name, hashed) VALUES ("${email}", "${user_name}", "${hashedPassword}")`,
           (err, results) => {
@@ -58,7 +57,10 @@ const login = (req, res) => {
         const match = await bcrypt.compare(password, rows[0].hashed);
         if (match) {
           const token = generateToken({ user_name, password });
-          res.json({ token: token, username: rows[0].user_name });
+          res.json({
+            token: token,
+            username: rows[0].user_name,
+          });
         } else {
           res.sendStatus(403);
         }
